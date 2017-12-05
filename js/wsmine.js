@@ -130,8 +130,8 @@ class WSMiner {
             if (!auth && doauth) {
                 auth = true;
                 msg = { "id": 2, "method": "mining.authorize", "params": [] };
-                msg.params[0] = $('#username').val();
-                msg.params[1] = $('#password').val();
+                msg.params[0] = this.user;
+                msg.params[1] = this.pass;
                 this.ws.send(JSON.stringify(msg) + "\n");
             }
         };
