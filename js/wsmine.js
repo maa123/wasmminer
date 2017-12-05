@@ -31,11 +31,11 @@ class WSMiner {
             }
             this.ws.send(JSON.stringify(msg) + "\n");
         }; //onopen
-        this.ws.onclose = function(ev) {
+        this.ws.onclose = (ev) => {
             console.log('close');
         };
         var work = {};
-        this.ws.onmessage = function(ev) {
+        this.ws.onmessage = (ev) => {
             console.log('message: ' + ev.data);
             var doauth = false;
             var json = JSON.parse(ev.data);
@@ -101,7 +101,7 @@ class WSMiner {
                         }
                         worker = new Worker(this.jshost + '/js/worker_all.js');
                         this.workers[i] = worker;
-                        worker.onmessage = function(e) {
+                        worker.onmessage = (e) => {
                             var result = e.data;
                             console.log('recv from worker: ' + result);
                             var xnonce2 = result[0];
@@ -118,7 +118,7 @@ class WSMiner {
                             worker.postMessage($.extend({}, work));
                         }
                     }
-                    setTimeout(function() {
+                    setTimeout(() => {
                         for (var i = 0; i < this.threads; i++) {
                             work['nonce'] = 0x10000000 * i;
                             console.log('start nonce', work['nonce']);
