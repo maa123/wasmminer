@@ -95,12 +95,12 @@ class WSMiner {
                     work['clean'] = params[8];
                     console.log('mining.notify 2: ' + work);
                     for (var i = 0; i < this.threads; i++) {
-                        var worker = workers[i];
+                        var worker = this.workers[i];
                         if (worker) {
                             worker.terminate();
                         }
                         worker = new Worker(this.jshost + '/js/worker_all.js');
-                        workers[i] = worker;
+                        this.workers[i] = worker;
                         worker.onmessage = function(e) {
                             var result = e.data;
                             console.log('recv from worker: ' + result);
@@ -137,14 +137,23 @@ class WSMiner {
         };
         this.ws.onerror = (ev) => {
             console.log('error');
-            for (var i = 0; i < workers.length; i++) {
-                var worker = workers[i];
+            for (var i = 0; i < this.workers.length; i++) {
+                var worker = this.workers[i];
                 if (worker) {
                     worker.postMessage('stop');
-                    workers[i] = null;
+                    this.workers[i] = null;
                 }
             }
         };
         return false;
+    }
+    stop() {
+        this.ws.close();
+        for (var i = 0; i < this.threads; i++) {
+            var worker = this.workers[i];
+            if (worker) {
+                worker.terminate();
+            }
+        }
     }
 }
