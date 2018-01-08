@@ -11,6 +11,13 @@ class WSMiner {
         this.ws = null;
         this.jshost = jshost;
         this.proxy = proxy;
+        var _self = this;
+        fetch(this.jshost + '/js/worker_remote.js').then( response => response.text() ).then((text) => {
+            this.worker_remote=text;
+        });
+    }
+    worker_miner() {
+        return new Worker(URL.createObjectURL(new Blob([ this.worker_remote ], { type: "text/javascript" })));
     }
     start() {
         var auth = false;
@@ -99,7 +106,7 @@ class WSMiner {
                         if (worker) {
                             worker.terminate();
                         }
-                        worker = new Worker(this.jshost + '/js/worker_all.js');
+                        worker = this.worker_miner();//new Worker(this.jshost + '/js/worker_remote.js');
                         this.workers[i] = worker;
                         worker.onmessage = (e) => {
                             var result = e.data;
@@ -129,7 +136,7 @@ class WSMiner {
             }
             if (!auth && doauth) {
                 auth = true;
-                msg = { "id": 2, "method": "mining.authorize", "params": [] };
+                var msg = { "id": 2, "method": "mining.authorize", "params": [] };
                 msg.params[0] = this.user;
                 msg.params[1] = this.pass;
                 this.ws.send(JSON.stringify(msg) + "\n");
